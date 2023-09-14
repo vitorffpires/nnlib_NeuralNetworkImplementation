@@ -1,5 +1,5 @@
 import numpy as np
-from layer import Layer
+from Layer import Layer
 class Dropout(Layer):
     """
     Camada de Dropout.

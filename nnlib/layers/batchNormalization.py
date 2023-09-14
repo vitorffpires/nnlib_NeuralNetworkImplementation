@@ -1,5 +1,5 @@
 import numpy as np
-from layer import Layer
+from Layer import Layer
 class BatchNormalization(Layer):
     """
     Camada de Normalização em Lote.

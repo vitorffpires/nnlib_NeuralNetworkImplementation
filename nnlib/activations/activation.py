@@ -13,7 +13,7 @@ class Activation(ABC):
         pass
 
     @abstractmethod
-    def forward(self, input_data):
+    def activate(self, input_data):
         """
         Calcula a ativação para os dados de entrada fornecidos.
 
@@ -28,7 +28,7 @@ class Activation(ABC):
         raise NotImplementedError("O método forward precisa ser implementado.")
 
     @abstractmethod
-    def backward(self, d_output):
+    def derivate(self, d_output):
         """
         Calcula a derivada da ativação em relação à saída.
 

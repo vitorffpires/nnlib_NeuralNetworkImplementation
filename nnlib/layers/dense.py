@@ -1,18 +1,18 @@
 import numpy as np
-from layer import Layer
-import nnlib.activations as ActivationFunction
-
+from Layer import Layer
+import Activations as ActivationFunctions
 class Dense(Layer):
     """
     Camada Densa (ou Totalmente Conectada).
     """
 
     def __init__(self, input_dim, output_dim, activation_function):
+        # TODO mapping for activation function
         self.input_dim = input_dim
         self.output_dim = output_dim
         self.weights = np.random.randn(input_dim, output_dim) * 0.01
         self.bias = np.zeros((1, output_dim))
-        self.activation = ActivationFunction(activation_function)
+        self.activation = ActivationFunctions.activation_function.activation_function()
 
     def forward_pass(self, input_data):
         self.input_data = input_data
