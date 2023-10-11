@@ -14,29 +14,29 @@ class ReLu(Activation):
         Activation: Abstract base class for activation functions.
     """
 
-    def activate(self, x: np.ndarray) -> np.ndarray:
+    def activate(self, x: np.array) -> np.array:
         """
         Computes the output of the ReLU activation function for the given input.
 
         Args:
-            x (np.ndarray): Input data, typically the output from a previous layer in a neural network.
+            x (np.array): Input data, typically the output from a previous layer in a neural network.
 
         Returns:
-            np.ndarray: Output after applying the ReLU activation function. Values less than 0 are set to 0.
+            np.array: Output after applying the ReLU activation function. Values less than 0 are set to 0.
         """
         return np.maximum(0, x)
     
-    def derivate(self, x: np.ndarray) -> np.ndarray:
+    def derivate(self, x: np.array) -> np.array:
         """
         Computes the derivative of the ReLU activation function with respect to its input.
 
         This is typically used during the backpropagation step in training neural networks.
 
         Args:
-            x (np.ndarray): Input data, typically the output from a previous layer in a neural network.
+            x (np.array): Input data, typically the output from a previous layer in a neural network.
 
         Returns:
-            np.ndarray: Derivative of the ReLU activation function with respect to its input. 
+            np.array: Derivative of the ReLU activation function with respect to its input. 
                         Returns 1 for values greater than 0, and 0 otherwise.
         """
         return np.where(x > 0, 1, 0)

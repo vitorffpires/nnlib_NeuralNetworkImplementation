@@ -13,6 +13,4 @@ class StochastciGradientDescent(Optimizer):
             The layer whose parameters are to be updated.
         """
         # Update weights and biases using the gradients and learning rate
-        layer.weights -= self.learning_rate * layer.derivative_weights
-        if layer.has_bias:
-            layer.biases -= self.learning_rate * layer.derivative_biases
+        layer.weights = self.learning_rate * layer.derivative_weights * -1

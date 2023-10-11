@@ -21,4 +21,4 @@ class Softmax(Activation):
             s = softmax[i].reshape(-1, 1)
             jacobian_batch[i] = np.diagflat(s) - np.dot(s, s.T)
         
-        return jacobian_batch
+        return jacobian_batch 

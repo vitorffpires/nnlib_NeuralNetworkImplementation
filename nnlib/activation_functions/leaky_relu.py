@@ -13,10 +13,10 @@ class LeakyReLu(Activation):
             A small positive value (e.g., 0.01) is typically used. Defaults to 0.01.
 
     Methods:
-        activate(x: np.ndarray) -> np.ndarray:
+        activate(x: np.array) -> np.array:
             Compute the output of the Leaky ReLu activation function for the given input.
 
-        derivate(x: np.ndarray) -> np.ndarray:
+        derivate(x: np.array) -> np.array:
             Compute the derivative of the Leaky ReLu activation function with respect to its input.
             This is typically used during the backpropagation step in training neural networks.
     """
@@ -31,31 +31,31 @@ class LeakyReLu(Activation):
         """
         self.alpha = alpha
 
-    def activate(self, x: np.ndarray) -> np.ndarray:
+    def activate(self, x: np.array) -> np.array:
         """
         Compute the output of the Leaky ReLu activation function for the given input.
 
         Args:
-            x (np.ndarray): Input data, typically the output from a previous layer in a neural network.
+            x (np.array): Input data, typically the output from a previous layer in a neural network.
 
         Returns:
-            np.ndarray: Output after applying the Leaky ReLu activation function.
+            np.array: Output after applying the Leaky ReLu activation function.
                         Values greater than or equal to zero remain unchanged, while
                         negative values are scaled by the specified alpha.
         """
         return np.where(x > 0, x, self.alpha * x)
 
-    def derivate(self, x: np.ndarray) -> np.ndarray:
+    def derivate(self, x: np.array) -> np.array:
         """
         Compute the derivative of the Leaky ReLu activation function with respect to its input.
 
         This is typically used during the backpropagation step in training neural networks.
 
         Args:
-            x (np.ndarray): Input data, typically the output from a previous layer in a neural network.
+            x (np.array): Input data, typically the output from a previous layer in a neural network.
 
         Returns:
-            np.ndarray: Derivative of the Leaky ReLu activation function with respect to its input. 
+            np.array: Derivative of the Leaky ReLu activation function with respect to its input. 
                         Returns 1 for values greater than zero and the specified alpha for
                         values less than or equal to zero.
         """

@@ -9,10 +9,10 @@ class Linear(Activation):
     It does not introduce any non-linearity to the network.
 
     Methods:
-        activate(x: np.ndarray) -> np.ndarray:
+        activate(x: np.array) -> np.array:
             Compute the output of the linear activation function for the given input.
 
-        derivative(x: np.ndarray) -> np.ndarray:
+        derivative(x: np.array) -> np.array:
             Compute the derivative of the linear activation function with respect to its input.
             This function always returns a constant value of 1.
 
@@ -20,26 +20,26 @@ class Linear(Activation):
         None
     """
 
-    def activate(self, x: np.ndarray) -> np.ndarray:
+    def activate(self, x: np.array) -> np.array:
         """
         Compute the output of the linear activation function for the given input.
 
         Args:
-            x (np.ndarray): Input data, typically the output from a previous layer in a neural network.
+            x (np.array): Input data, typically the output from a previous layer in a neural network.
 
         Returns:
-            np.ndarray: Output equal to the input value x.
+            np.array: Output equal to the input value x.
         """
         return x
 
-    def derivate(self, x: np.ndarray) -> np.ndarray:
+    def derivate(self, x: np.array) -> np.array:
         """
         Compute the derivative of the linear activation function with respect to its input.
 
         Args:
-            x (np.ndarray): Input data, typically the output from a previous layer in a neural network.
+            x (np.array): Input data, typically the output from a previous layer in a neural network.
 
         Returns:
-            np.ndarray: Derivative of the linear activation function always equal to 1.
+            np.array: Derivative of the linear activation function always equal to 1.
         """
         return np.ones_like(x)

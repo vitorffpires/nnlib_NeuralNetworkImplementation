@@ -9,5 +9,5 @@ class MeanSquaredError(LossFunction):
 
         
     def derivate(self, ypredict: np.array, ytrue: np.array) -> np.array:
-        gradient = -2 * (ytrue - ypredict)
+        gradient = 2 * (ytrue - ypredict)
         return gradient

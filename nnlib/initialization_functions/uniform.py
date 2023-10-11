@@ -10,6 +10,3 @@ class Uniform(Initializer):
     def initialize_weights(self, input_dim: int, n_units: int) -> np.array:
         weight_matrix = np.random.uniform(self.low_limit, self.high_limit, (input_dim, n_units))
         return weight_matrix
-    
-    def initialize_bias(self, n_units):
-        return np.zeros((1, n_units))

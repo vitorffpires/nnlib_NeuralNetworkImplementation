@@ -10,8 +10,3 @@ class Optimizer(ABC):
     @abstractmethod
     def update(self, layer: Layer) -> None:
         pass
-    
-    
-    def backpropagate(self, layers: list) -> None:
-        for layer in layers:
-            self.update(layer)

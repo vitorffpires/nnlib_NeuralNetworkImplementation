@@ -9,37 +9,37 @@ class Tanh(Activation):
     to introduce non-linearity.
 
     Methods:
-        activate(x: np.ndarray) -> np.ndarray:
+        activate(x: np.array) -> np.array:
             Compute the output of the Tanh activation function for the given input.
 
-        derivative(x: np.ndarray) -> np.ndarray:
+        derivative(x: np.array) -> np.array:
             Compute the derivative of the Tanh activation function with respect to its input.
 
     Args:
         None
     """
 
-    def activate(self, x: np.ndarray) -> np.ndarray:
+    def activate(self, x: np.array) -> np.array:
         """
         Compute the output of the Tanh activation function for the given input.
 
         Args:
-            x (np.ndarray): Input data, typically the output from a previous layer in a neural network.
+            x (np.array): Input data, typically the output from a previous layer in a neural network.
 
         Returns:
-            np.ndarray: Output values in the range (-1, 1) after applying the Tanh function.
+            np.array: Output values in the range (-1, 1) after applying the Tanh function.
         """
         return np.tanh(x)
 
-    def derivate(self, x: np.ndarray) -> np.ndarray:
+    def derivate(self, x: np.array) -> np.array:
         """
         Compute the derivative of the Tanh activation function with respect to its input.
 
         Args:
-            x (np.ndarray): Input data, typically the output from a previous layer in a neural network.
+            x (np.array): Input data, typically the output from a previous layer in a neural network.
 
         Returns:
-            np.ndarray: Derivative of the Tanh activation function at the given input values.
+            np.array: Derivative of the Tanh activation function at the given input values.
                         It is calculated as 1 - tanh(x)^2.
         """
         return 1 - np.tanh(x)**2

@@ -14,5 +14,5 @@ class BinaryCrossEntropyLoss(LossFunction):
 
         epsilon = 1e-15  # To prevent division by zero
         ypredict = np.clip(ypredict, epsilon, 1. - epsilon)  # Clip predictions
-        gradient = -(ytrue / ypredict - (1 - ytrue) / (1 - ypredict))
+        gradient = (ytrue / ypredict - (1 - ytrue) / (1 - ypredict))
         return gradient

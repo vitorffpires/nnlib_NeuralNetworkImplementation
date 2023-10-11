@@ -10,6 +10,3 @@ class Normal(Initializer):
     def initialize_weights(self, input_dim: int, n_units: int) -> np.array:
         weight_matrix = np.random.normal(self.mean, self.std, (input_dim, n_units))
         return weight_matrix
-    
-    def initialize_bias(self, n_units):
-        return np.zeros((1, n_units))
