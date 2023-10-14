@@ -1,8 +1,9 @@
 import numpy as np 
-import pickle
+import joblib
 from nnlib.layers.layer import Layer
 from nnlib.loss_functions.loss import LossFunction
 from nnlib.optimization_functions.optimizer import Optimizer
+from nnlib.optimization_functions.adam import AdaptiveMomentEstimation
 from nnlib.initialization_functions.initializer import Initializer
 from nnlib.activation_functions.activation import Activation
 
@@ -37,9 +38,13 @@ class SequentialModel():
             for layer in self.layers:
                 # Initialize weights 
                 weights = initializer.initialize_weights(input_dim, layer.n_units)
+                if optimizer == AdaptiveMomentEstimation:
+                    # Initialize m and v for Adam
+                    layer.m = np.zeros_like(weights)
+                    layer.v = np.zeros_like(weights)
     
                 # Set the initialized weights to the layer
-                layer.set_weights({'weights': weights})
+                layer.set_weights(weights)
     
                 # Update input_dim for the next layer
                 input_dim = layer.n_units
@@ -60,27 +65,31 @@ class SequentialModel():
                 for layer in self.layers:
                     i=i+1
                     output = layer.forward(output)
-                    print(f'on layer {i} the output is: {output}')
 
                 # Compute loss
                 loss_value = self.loss.compute(y_batch, output)
                 epoch_losses.append(loss_value)
-                print(f'on loss: {loss_value}')
+                #print(f'the loss is: {loss_value}')
 
                 # Backward pass
-                dLda = self.loss.derivate(y_batch, output)  # Corrected method name
-                print(f'on loss the derivate is: {dLda}')
+                dLda = self.loss.derivate(y_batch, output)
+                #print(f'on loss the derivate is: \n {dLda}')
                 i=0
                 for layer in reversed(self.layers):
                     i=i+1
                     dLda = layer.backward(dLda)
-                    print(f'on layer {i} the derivate on the backward is: {dLda}')
+                    #print(f'on layer {i} the derivate on the backward is:')
+                    #print(dLda)
 
                     # Update parameters
+                    #print(f'pessos na camada {i} antes do otimizador:') 
+                    #print(f'{layer.weights}')
                     self.optimizer.update(layer)
+                    #print(f'pessos na camada {i} depois do otimizador:') 
+                    #print(f'{layer.weights}')
 
             # Compute average loss for the epoch
-            avg_epoch_loss = np.mean(epoch_losses)
+            avg_epoch_loss = np.average(epoch_losses)
 
             # Validate the model if validation data is provided
             if X_val is not None and y_val is not None:
@@ -89,7 +98,7 @@ class SequentialModel():
                 # Check and update best parameters if current validation loss is lower
                 if val_loss < self.best_params['loss']:
                     self.best_params['loss'] = val_loss
-                    self.best_params['weights'] = [layer.get_weights()['weights'] for layer in self.layers]
+                    self.best_params['weights'] = [layer.get_weights() for layer in self.layers]
                     self.best_params['epoch'] = epoch
 
             # Implement logging
@@ -98,6 +107,9 @@ class SequentialModel():
                 if X_val is not None and y_val is not None:
                     log_msg += f" - val_loss: {val_loss:.4f}"
                 print(log_msg)
+        # Update layers with the best weights found during training
+        for i, layer in enumerate(self.layers):
+            layer.set_weights(self.best_params['weights'][i])    
 
     def evaluate(self, X: np.array, y: np.array) -> float:
         """
@@ -121,45 +133,17 @@ class SequentialModel():
         # Compute loss
         loss_value = self.loss.compute(y, output)
         return loss_value
-
-    def save_model(self, filename: str) -> None:
-        """
-        Save the model parameters to a file.
-
-        Parameters:
-        - filename: str
-            The name of the file to save the model parameters.
-        """
-        model_params = {
-            'weights': [layer.get_weights()['weights'] for layer in self.layers],
-            'best_params': self.best_params,
-            'history': self.history
-        }
-        
-        with open(filename, 'wb') as f:
-            pickle.dump(model_params, f)
-    
-    def load_model(self, filename: str) -> None:
-        """
-        Load the model parameters from a file.
-
-        Parameters:
-        - filename: str
-            The name of the file from which to load the model parameters.
-        """
-        with open(filename, 'rb') as f:
-            model_params = pickle.load(f)
-        
-        for i, layer in enumerate(self.layers):
-            layer.set_weights({
-                'weights': model_params['weights'][i]
-            })
-        
-        self.best_params = model_params['best_params']
-        self.history = model_params['history']
     
     def predict(self, X: np.array) -> np.array:
         output = X
         for layer in self.layers:
             output = layer.forward(output)
         return output
+    
+    def export_net(self, filename: str) -> None: 
+         # Save the model to a file
+        joblib.dump(self, filename)
+
+    def import_net(filename: str) -> 'SequentialModel':
+        # Load the model from a file
+        return joblib.load(filename)

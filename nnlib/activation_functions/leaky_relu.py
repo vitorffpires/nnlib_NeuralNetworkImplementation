@@ -43,6 +43,8 @@ class LeakyReLu(Activation):
                         Values greater than or equal to zero remain unchanged, while
                         negative values are scaled by the specified alpha.
         """
+        if x.ndim != 2:
+            raise ValueError(f"on activation, x must be a 2D array, got {x.ndim}")
         return np.where(x > 0, x, self.alpha * x)
 
     def derivate(self, x: np.array) -> np.array:
@@ -59,4 +61,6 @@ class LeakyReLu(Activation):
                         Returns 1 for values greater than zero and the specified alpha for
                         values less than or equal to zero.
         """
+        if x.ndim != 2:
+            raise ValueError(f"on activation, x must be a 2D array, got {x.ndim}")
         return np.where(x > 0, 1, self.alpha)

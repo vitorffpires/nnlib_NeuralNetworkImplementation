@@ -29,6 +29,8 @@ class Sigmoid(Activation):
         Returns:
             np.array: Output values in the range (0, 1) after applying the sigmoid function.
         """
+        if x.ndim != 2:
+            raise ValueError(f"on activation, x must be a 2D array, got {x.ndim}")
         return 1 / (1 + np.exp(-x))
     
     def derivate(self, x: np.array) -> np.array:
@@ -42,5 +44,7 @@ class Sigmoid(Activation):
             np.array: Derivative of the sigmoid activation function at the given input values.
                         It is calculated as sigmoid(x) * (1 - sigmoid(x)).
         """
-        sigmoid = self.activate(x)
-        return sigmoid * (1 - sigmoid)
+        if x.ndim != 2:
+            raise ValueError(f"on activation, x must be a 2D array, got {x.ndim}")
+        x = self.activate(x)
+        return x * (1 - x)

@@ -24,6 +24,8 @@ class ReLu(Activation):
         Returns:
             np.array: Output after applying the ReLU activation function. Values less than 0 are set to 0.
         """
+        if x.ndim != 2:
+            raise ValueError(f"on activation, x must be a 2D array, got {x.ndim}")
         return np.maximum(0, x)
     
     def derivate(self, x: np.array) -> np.array:
@@ -39,4 +41,6 @@ class ReLu(Activation):
             np.array: Derivative of the ReLU activation function with respect to its input. 
                         Returns 1 for values greater than 0, and 0 otherwise.
         """
+        if x.ndim != 2:
+            raise ValueError(f"on activation, x must be a 2D array, got {x.ndim}")
         return np.where(x > 0, 1, 0)

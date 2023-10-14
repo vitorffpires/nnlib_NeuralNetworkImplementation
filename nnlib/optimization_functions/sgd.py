@@ -6,11 +6,11 @@ class StochastciGradientDescent(Optimizer):
     
     def update(self, layer: Layer) -> None:
         """
-        Update the weights and biases of the given layer using SGD.
+        Update the weights of the given layer using SGD.
         
         Parameters:
         - layer: Layer
             The layer whose parameters are to be updated.
         """
-        # Update weights and biases using the gradients and learning rate
-        layer.weights = self.learning_rate * layer.derivative_weights * -1
+        # Update weights using the gradients and learning rate
+        layer.weights = layer.weights - (self.learning_rate * layer.derivative_weights)

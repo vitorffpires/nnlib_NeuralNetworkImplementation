@@ -30,6 +30,8 @@ class Linear(Activation):
         Returns:
             np.array: Output equal to the input value x.
         """
+        if x.ndim != 2:
+            raise ValueError(f"on activation, x must be a 2D array, got {x.ndim}")
         return x
 
     def derivate(self, x: np.array) -> np.array:
@@ -42,4 +44,6 @@ class Linear(Activation):
         Returns:
             np.array: Derivative of the linear activation function always equal to 1.
         """
+        if x.ndim != 2:
+            raise ValueError(f"on activation, x must be a 2D array, got {x.ndim}")
         return np.ones_like(x)
