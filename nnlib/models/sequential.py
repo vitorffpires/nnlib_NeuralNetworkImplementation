@@ -83,7 +83,7 @@ class SequentialModel():
                 input_dim = layer.n_units
     
     def fit(self, X: np.array, y: np.array, epochs: int, batch_size: int, 
-            X_val: np.array = None, y_val: np.array = None, verbose: bool = True) -> None:
+            X_val: np.array = None, y_val: np.array = None, verbose: bool = True, plot_histograms: bool = True) -> None:
         """
         Train the model for a fixed number of epochs.
         
@@ -95,6 +95,7 @@ class SequentialModel():
         - X_val (np.array, optional): Validation data.
         - y_val (np.array, optional): Target values for validation data.
         - verbose (bool, optional): Whether to print training progress or not.
+        - plot_histograms (bool, optional): Whether to plot histograms for activations and gradients or not.
         """
         # Initialize lists to store metrics
         epoch_gradients = []
@@ -183,28 +184,29 @@ class SequentialModel():
                 print(log_msg)
 
         # Plotting for each epoch
-        for epoch_idx in range(epochs):
-            # Activations Histogram
-            plt.figure(figsize=(15, 5))
-            for i, activations in enumerate(epoch_activations[epoch_idx*len(self.layers):(epoch_idx*len(self.layers))+len(self.layers)]):
-                plt.subplot(1, len(self.layers), i+1)
-                plt.hist(activations, bins=8)
-                plt.title(f"Layer {i+1} Activations Histogram - Epoch {epoch_idx+1}")
-                plt.xlabel("Activation Value")
-                plt.ylabel("Frequency")
-            plt.tight_layout()
-            plt.show()
+        if plot_histograms:
+            for epoch_idx in range(epochs):
+                # Activations Histogram
+                plt.figure(figsize=(15, 5))
+                for i, activations in enumerate(epoch_activations[epoch_idx*len(self.layers):(epoch_idx*len(self.layers))+len(self.layers)]):
+                    plt.subplot(1, len(self.layers), i+1)
+                    plt.hist(activations, bins=8)
+                    plt.title(f"Layer {i+1} Activations Histogram - Epoch {epoch_idx+1}")
+                    plt.xlabel("Activation Value")
+                    plt.ylabel("Frequency")
+                plt.tight_layout()
+                plt.show()
 
-            # Gradients Histogram
-            plt.figure(figsize=(15, 5))
-            for i, gradients in enumerate(epoch_gradients[epoch_idx*len(self.layers):(epoch_idx*len(self.layers))+len(self.layers)]):
-                plt.subplot(1, len(self.layers), i+1)
-                plt.hist(gradients, bins=8)
-                plt.title(f"Layer {i+1} Gradients Histogram - Epoch {epoch_idx+1}")
-                plt.xlabel("Gradient Value")
-                plt.ylabel("Frequency")
-            plt.tight_layout()
-            plt.show()
+                # Gradients Histogram
+                plt.figure(figsize=(15, 5))
+                for i, gradients in enumerate(epoch_gradients[epoch_idx*len(self.layers):(epoch_idx*len(self.layers))+len(self.layers)]):
+                    plt.subplot(1, len(self.layers), i+1)
+                    plt.hist(gradients, bins=8)
+                    plt.title(f"Layer {i+1} Gradients Histogram - Epoch {epoch_idx+1}")
+                    plt.xlabel("Gradient Value")
+                    plt.ylabel("Frequency")
+                plt.tight_layout()
+                plt.show()
 
         # Losses Line Plot
         plt.figure(figsize=(10, 5))
