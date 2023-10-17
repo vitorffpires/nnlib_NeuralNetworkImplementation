@@ -37,7 +37,7 @@ class AdaptiveMomentEstimation(Optimizer):
         Parameters:
         - layer (Layer): The layer whose weights and biases need to be updated.
         """
-        if (layer.m_w is None) or (layer.v_w is None):
+        if (layer.m_w is None) or (layer.v_w is None) or (layer.m_b is None) or (layer.v_b is None):
             layer.m_w = np.zeros_like(layer.get_weights()['weights'])
             layer.v_w = np.zeros_like(layer.get_weights()['weights'])
             layer.m_b = np.zeros_like(layer.get_weights()['bias'])

@@ -69,9 +69,11 @@ class SequentialModel():
                 weights = initializer.initialize_weights(input_dim = input_dim, n_units = layer.n_units)
                 bias = np.zeros((1, layer.n_units))
                 if isinstance(optimizer, AdaptiveMomentEstimation):
-                    # Initialize m and v for Adam
-                    layer.m = np.zeros_like(weights)
-                    layer.v = np.zeros_like(weights)
+                    # Initialize m and v for Adam optimizer
+                    layer.m_w = np.zeros_like(weights)
+                    layer.v_w = np.zeros_like(weights)
+                    layer.m_b = np.zeros_like(bias)
+                    layer.v_b = np.zeros_like(bias)
 
                 weights = {"weights": weights, "bias": bias}
                 # Set the initialized weights to the layer
