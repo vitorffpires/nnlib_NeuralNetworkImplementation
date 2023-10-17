@@ -10,17 +10,42 @@ from nnlib.initialization_functions.initializer import Initializer
 from nnlib.activation_functions.activation import Activation
 
 class SequentialModel():
+    """
+    A simple sequential neural network model.
+    
+    Attributes:
+    - layers (list): A list of layers added to the model.
+    - optimizer (Optimizer): The optimization algorithm used for training.
+    - loss (LossFunction): The loss function used for training.
+    - best_params (dict): Dictionary to store the best parameters during training.
+    """
     
     def __init__(self) -> None:
+        """Initialize the SequentialModel with empty layers and no optimizer or loss function."""
         self.layers = []
         self.optimizer = None
         self.loss = None
         self.best_params = {'loss': float('inf'), 'weights': None, 'epoch': 0}
     
     def add(self, layer: Layer) -> None:
+        """
+        Add a layer to the model.
+        
+        Parameters:
+        - layer (Layer): The layer to be added.
+        """
         self.layers.append(layer)
     
     def compile(self, optimizer: Optimizer, loss: LossFunction, initializer: Initializer, X: np.array = None) -> None:
+        """
+        Configure the model for training.
+        
+        Parameters:
+        - optimizer (Optimizer): The optimization algorithm.
+        - loss (LossFunction): The loss function.
+        - initializer (Initializer): The weight initializer.
+        - X (np.array, optional): Input data, used to infer input_dim if not set in the first layer.
+        """
         self.optimizer = optimizer
         self.loss = loss
 
@@ -40,11 +65,13 @@ class SequentialModel():
             for layer in self.layers:
                 # Initialize weights 
                 weights = initializer.initialize_weights(input_dim = input_dim, n_units = layer.n_units)
+                bias = np.zeros((1, layer.n_units))
                 if isinstance(optimizer, AdaptiveMomentEstimation):
                     # Initialize m and v for Adam
                     layer.m = np.zeros_like(weights)
                     layer.v = np.zeros_like(weights)
-    
+
+                weights = {"weights": weights, "bias": bias}
                 # Set the initialized weights to the layer
                 layer.set_weights(weights = weights)
     
@@ -53,6 +80,18 @@ class SequentialModel():
     
     def fit(self, X: np.array, y: np.array, epochs: int, batch_size: int, 
             X_val: np.array = None, y_val: np.array = None, verbose: bool = True) -> None:
+        """
+        Train the model for a fixed number of epochs.
+        
+        Parameters:
+        - X (np.array): Training data.
+        - y (np.array): Target values.
+        - epochs (int): Number of epochs to train the model.
+        - batch_size (int): Number of samples per gradient update.
+        - X_val (np.array, optional): Validation data.
+        - y_val (np.array, optional): Target values for validation data.
+        - verbose (bool, optional): Whether to print training progress or not.
+        """
         # Initialize lists to store metrics
         epoch_gradients = []
         epoch_activations = []
@@ -185,14 +224,11 @@ class SequentialModel():
         Evaluate the model on the provided data.
         
         Parameters:
-        - X: np.array
-            Input data.
-        - y: np.array
-            True labels.
+        - X (np.array): Input data.
+        - y (np.array): True labels.
         
         Returns:
-        float:
-            Loss value.
+        - float: Loss value.
         """
         # Forward pass
         output = X
@@ -204,15 +240,37 @@ class SequentialModel():
         return loss_value
     
     def predict(self, X: np.array) -> np.array:
+        """
+        Generate output predictions for the input samples.
+        
+        Parameters:
+        - X (np.array): Input data.
+        
+        Returns:
+        - np.array: Predictions.
+        """
         output = X
         for layer in self.layers:
             output = layer.forward(input = output)
         return output
     
     def export_net(self, filename: str) -> None: 
-         # Save the model to a file
+        """
+        Save the model to a file.
+        
+        Parameters:
+        - filename (str): The name of the file to save the model.
+        """
         joblib.dump(self, filename)
 
     def import_net(filename: str) -> 'SequentialModel':
-        # Load the model from a file
+        """
+        Load the model from a file.
+        
+        Parameters:
+        - filename (str): The name of the file from which to load the model.
+        
+        Returns:
+        - SequentialModel: The loaded model.
+        """
         return joblib.load(filename)

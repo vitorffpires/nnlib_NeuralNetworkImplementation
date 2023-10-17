@@ -14,3 +14,5 @@ class StochastciGradientDescent(Optimizer):
         """
         # Update weights using the gradients and learning rate
         layer.weights = layer.weights - (self.learning_rate * layer.derivative_weights)
+
+        layer.biases = layer.biases - (self.learning_rate * layer.derivative_bias)
