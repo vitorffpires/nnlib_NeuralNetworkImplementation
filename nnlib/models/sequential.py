@@ -91,6 +91,7 @@ class SequentialModel():
         - X_val (np.array, optional): Validation data.
         - y_val (np.array, optional): Target values for validation data.
         - verbose (bool, optional): Whether to print training progress or not.
+        - plot_histograms (bool, optional): Whether to plot histograms for activations and gradients or not.
         """
         # Initialize lists to store metrics
         epoch_gradients = []
