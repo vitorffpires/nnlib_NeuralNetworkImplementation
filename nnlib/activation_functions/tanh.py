@@ -46,5 +46,5 @@ class Tanh(Activation):
         """
         if x.ndim != 2:
             raise ValueError(f"on activation, x must be a 2D array, got {x.ndim}")
-        x = self.activate(x)
+        x = self.activate(x = x)
         return 1 - x**2

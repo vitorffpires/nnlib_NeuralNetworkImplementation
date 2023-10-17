@@ -3,7 +3,7 @@ from nnlib.layers.layer import Layer
 from nnlib.optimization_functions.optimizer import Optimizer
 class AdaptiveMomentEstimation(Optimizer):
     
-    def __init__(self, learning_rate: float = 0.01, beta_1: float = 0.8, beta_2: float = 0.8, epsilon: float = 1e-15) -> None:
+    def __init__(self, learning_rate: float = 0.01, beta_1: float = 0.9, beta_2: float =0.999, epsilon: float = 1e-15) -> None:
         super().__init__(learning_rate)
         self.beta_1 = beta_1
         self.beta_2 = beta_2
@@ -11,13 +11,6 @@ class AdaptiveMomentEstimation(Optimizer):
         self.t = 0     # Time step counter
 
     def update(self, layer: Layer) -> None:
-        """
-        Update the weights of the given layer using Adam.
-        
-        Parameters:
-        - layer: Layer
-            The layer whose parameters are to be updated.
-        """
         # Initialize moving averages if first update
         if (layer.m is None) or (layer.v is None):
             layer.m = np.zeros_like(layer.get_weights())

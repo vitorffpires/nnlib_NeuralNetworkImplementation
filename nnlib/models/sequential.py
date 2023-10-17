@@ -1,4 +1,6 @@
 import numpy as np 
+import matplotlib.pyplot as plt
+from sklearn.metrics import accuracy_score
 import joblib
 from nnlib.layers.layer import Layer
 from nnlib.loss_functions.loss import LossFunction
@@ -37,22 +39,29 @@ class SequentialModel():
             
             for layer in self.layers:
                 # Initialize weights 
-                weights = initializer.initialize_weights(input_dim, layer.n_units)
-                if optimizer == AdaptiveMomentEstimation:
+                weights = initializer.initialize_weights(input_dim = input_dim, n_units = layer.n_units)
+                if isinstance(optimizer, AdaptiveMomentEstimation):
                     # Initialize m and v for Adam
                     layer.m = np.zeros_like(weights)
                     layer.v = np.zeros_like(weights)
     
                 # Set the initialized weights to the layer
-                layer.set_weights(weights)
+                layer.set_weights(weights = weights)
     
                 # Update input_dim for the next layer
                 input_dim = layer.n_units
     
     def fit(self, X: np.array, y: np.array, epochs: int, batch_size: int, 
             X_val: np.array = None, y_val: np.array = None, verbose: bool = True) -> None:
+        # Initialize lists to store metrics
+        epoch_gradients = []
+        epoch_activations = []
+        train_losses = []
+        train_accuracies = []
+        val_losses = []
+        val_accuracies = []
         for epoch in range(epochs):
-            epoch_losses = []  # To store loss for each batch in the epoch
+            epoch_losses = []
 
             # Batch training
             for i in range(0, len(X), batch_size):
@@ -64,42 +73,56 @@ class SequentialModel():
                 i=0
                 for layer in self.layers:
                     i=i+1
-                    output = layer.forward(output)
+                    output = layer.forward(input = output)
+                #print(f'output da rede foi \n {output}')
 
                 # Compute loss
-                loss_value = self.loss.compute(y_batch, output)
-                epoch_losses.append(loss_value)
-                #print(f'the loss is: {loss_value}')
+                loss_value = self.loss.compute(ytrue = y_batch, ypredict = output)
+                #print(f'o custo foi: {loss_value}')
 
                 # Backward pass
-                dLda = self.loss.derivate(y_batch, output)
+                dLda = self.loss.derivate(ytrue = y_batch, ypredict =output)    
+                epoch_losses.append(loss_value)
                 #print(f'on loss the derivate is: \n {dLda}')
                 i=0
                 for layer in reversed(self.layers):
                     i=i+1
-                    dLda = layer.backward(dLda)
+                    dLda = layer.backward(loss_derivative = dLda)
+
                     #print(f'on layer {i} the derivate on the backward is:')
                     #print(dLda)
 
                     # Update parameters
                     #print(f'pessos na camada {i} antes do otimizador:') 
                     #print(f'{layer.weights}')
-                    self.optimizer.update(layer)
+                    self.optimizer.update(layer = layer)
                     #print(f'pessos na camada {i} depois do otimizador:') 
                     #print(f'{layer.weights}')
-
             # Compute average loss for the epoch
+            for layer in self.layers:
+                epoch_gradients.append(layer.derivative_weights)
+                epoch_activations.append(layer.layer_output)
             avg_epoch_loss = np.average(epoch_losses)
-
+            train_losses.append(avg_epoch_loss)
+            train_pred = self.predict(X)
+            train_accuracy = accuracy_score(y, np.round(train_pred))
+            train_accuracies.append(train_accuracy)
+            
             # Validate the model if validation data is provided
             if X_val is not None and y_val is not None:
-                val_loss = self.evaluate(X_val, y_val)
+                val_loss = self.evaluate(X = X_val, y = y_val)
+                val_losses.append(val_loss)
+                val_pred = self.predict(X_val)
+                val_accuracy = accuracy_score(y_val, np.round(val_pred))
+                val_accuracies.append(val_accuracy)
+
+                #print(f'val_loss foi: {val_loss}')
 
                 # Check and update best parameters if current validation loss is lower
                 if val_loss < self.best_params['loss']:
                     self.best_params['loss'] = val_loss
                     self.best_params['weights'] = [layer.get_weights() for layer in self.layers]
-                    self.best_params['epoch'] = epoch
+                    self.best_params['epoch'] = epoch+1
 
             # Implement logging
             if verbose:
@@ -107,9 +130,55 @@ class SequentialModel():
                 if X_val is not None and y_val is not None:
                     log_msg += f" - val_loss: {val_loss:.4f}"
                 print(log_msg)
-        # Update layers with the best weights found during training
-        for i, layer in enumerate(self.layers):
-            layer.set_weights(self.best_params['weights'][i])    
+
+        # Plotting for each epoch
+        for epoch_idx in range(epochs):
+            # Activations Histogram
+            plt.figure(figsize=(15, 5))
+            for i, activations in enumerate(epoch_activations[epoch_idx*len(self.layers):(epoch_idx*len(self.layers))+len(self.layers)]):
+                plt.subplot(1, len(self.layers), i+1)
+                plt.hist(activations, bins=8)
+                plt.title(f"Layer {i+1} Activations Histogram - Epoch {epoch_idx+1}")
+                plt.xlabel("Activation Value")
+                plt.ylabel("Frequency")
+            plt.tight_layout()
+            plt.show()
+
+            # Gradients Histogram
+            plt.figure(figsize=(15, 5))
+            for i, gradients in enumerate(epoch_gradients[epoch_idx*len(self.layers):(epoch_idx*len(self.layers))+len(self.layers)]):
+                plt.subplot(1, len(self.layers), i+1)
+                plt.hist(gradients, bins=8)
+                plt.title(f"Layer {i+1} Gradients Histogram - Epoch {epoch_idx+1}")
+                plt.xlabel("Gradient Value")
+                plt.ylabel("Frequency")
+            plt.tight_layout()
+            plt.show()
+
+        # Losses Line Plot
+        plt.figure(figsize=(10, 5))
+        plt.subplot(1, 2, 1)
+        plt.plot(train_losses, label="Training Loss", color="blue")
+        if X_val is not None and y_val is not None:
+            plt.plot(val_losses, label="Validation Loss", color="red")
+        plt.title("Loss vs Epoch")
+        plt.xlabel("Epoch")
+        plt.ylabel("Loss Value")
+        plt.legend()
+
+        # Accuracies Line Plot
+        plt.subplot(1, 2, 2)
+        plt.plot(train_accuracies, label="Training Accuracy", color="blue")
+        if X_val is not None and y_val is not None:
+            plt.plot(val_accuracies, label="Validation Accuracy", color="red")
+        plt.title("Accuracy vs Epoch")
+        plt.xlabel("Epoch")
+        plt.ylabel("Accuracy Value")
+        plt.legend()
+        plt.tight_layout()
+        plt.show()
+
+
 
     def evaluate(self, X: np.array, y: np.array) -> float:
         """
@@ -128,16 +197,16 @@ class SequentialModel():
         # Forward pass
         output = X
         for layer in self.layers:
-            output = layer.forward(output)
-        
+            output = layer.forward(input = output)
+        #print(f'output da rede foi \n {output}')
         # Compute loss
-        loss_value = self.loss.compute(y, output)
+        loss_value = self.loss.compute(ytrue = y, ypredict= output)
         return loss_value
     
     def predict(self, X: np.array) -> np.array:
         output = X
         for layer in self.layers:
-            output = layer.forward(output)
+            output = layer.forward(input = output)
         return output
     
     def export_net(self, filename: str) -> None: 

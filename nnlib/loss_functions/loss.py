@@ -4,10 +4,10 @@ import numpy as np
 class LossFunction(ABC):
      
     @abstractmethod
-    def compute(self, ypredict: np.array, ytrue: np.array) -> float:
+    def compute(self, ytrue: np.array, ypredict: np.array) -> float:
         pass
 
 
     @abstractmethod
-    def derivate(self, ypredict: np.array, ytrue: np.array) -> np.array:
+    def derivate(self, ytrue: np.array, ypredict: np.array) -> np.array:
         pass

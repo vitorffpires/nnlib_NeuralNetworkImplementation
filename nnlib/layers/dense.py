@@ -1,4 +1,5 @@
 from nnlib.layers.layer import Layer
+from nnlib.activation_functions.softmax import Softmax
 import numpy as np
 
 class Dense(Layer):
@@ -13,7 +14,7 @@ class Dense(Layer):
     
     def backward(self, loss_derivative: np.array) -> np.array:
         # Calculating the derivative of the activation function
-        activation_derivative = self.activation.derivate(self.weighted_vector)
+        activation_derivative = self.activation.derivate(x = self.weighted_vector)
         
         self.delta = np.multiply(loss_derivative, activation_derivative) 
         
