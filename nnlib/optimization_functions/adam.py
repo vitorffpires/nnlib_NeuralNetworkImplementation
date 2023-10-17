@@ -68,14 +68,16 @@ class AdaptiveMomentEstimation(Optimizer):
         m_corrected_b = layer.m_b / (1. - self.beta_1**self.t)
         v_corrected_b = layer.v_b / (1. - self.beta_2**self.t)
         
-        # Update weights and biases
+        # remove from update the weights dropped out
         updated_weights = (self.learning_rate * m_corrected_w / (np.sqrt(v_corrected_w) + self.epsilon))
         if self.dropout > 0:
             idx_qty = int(len(layer.weights) * self.dropout)
             idx_dropouts = np.random.randint(0, len(layer.weights), idx_qty)
             
+            #use 0 to not update the weights dropped out
             for idx in idx_dropouts:
                 updated_weights[idx] = 0
 
+        # Update weights and biases
         layer.weights = layer.weights - updated_weights
         layer.bias = layer.bias - (self.learning_rate * m_corrected_b / (np.sqrt(v_corrected_b) + self.epsilon))

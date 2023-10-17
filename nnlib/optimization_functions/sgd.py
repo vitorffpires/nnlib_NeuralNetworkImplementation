@@ -15,15 +15,17 @@ class StochastciGradientDescent(Optimizer):
         - layer: Layer
             The layer whose parameters are to be updated.
         """
-        # Update weights using the gradients and learning rate
+        #remove from update the weights dropped out
         updated_weights = (self.learning_rate * layer.derivative_weights)
         if self.dropout > 0:
             idx_qty = int(len(layer.weights) * self.dropout)
             idx_dropouts = np.random.randint(0, len(layer.weights), idx_qty)
             
+            #use 0 to not update the weights dropped out
             for idx in idx_dropouts:
                 updated_weights[idx] = 0
 
+        # Update weights using the gradients and learning rate
         layer.weights = layer.weights - updated_weights
 
         layer.biases = layer.biases - (self.learning_rate * layer.derivative_bias)
