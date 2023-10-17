@@ -1,9 +1,11 @@
 import numpy as np 
 import matplotlib.pyplot as plt
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, mean_squared_error
 import joblib
 from nnlib.layers.layer import Layer
 from nnlib.loss_functions.loss import LossFunction
+from nnlib.loss_functions.bce import BinaryCrossEntropy
+from nnlib.loss_functions.mse import MeanSquaredError
 from nnlib.optimization_functions.optimizer import Optimizer
 from nnlib.optimization_functions.adam import AdaptiveMomentEstimation
 from nnlib.initialization_functions.initializer import Initializer
@@ -144,16 +146,24 @@ class SequentialModel():
             avg_epoch_loss = np.average(epoch_losses)
             train_losses.append(avg_epoch_loss)
             train_pred = self.predict(X)
-            train_accuracy = accuracy_score(y, np.round(train_pred))
-            train_accuracies.append(train_accuracy)
+            if isinstance(self.loss, BinaryCrossEntropy):
+                train_accuracy = accuracy_score(y, np.round(train_pred))
+                train_accuracies.append(train_accuracy)
+            elif isinstance(self.loss, MeanSquaredError):
+                train_accuracy = mean_squared_error(y, np.round(train_pred))
+                train_accuracies.append(train_accuracy)
             
             # Validate the model if validation data is provided
             if X_val is not None and y_val is not None:
                 val_loss = self.evaluate(X = X_val, y = y_val)
                 val_losses.append(val_loss)
                 val_pred = self.predict(X_val)
-                val_accuracy = accuracy_score(y_val, np.round(val_pred))
-                val_accuracies.append(val_accuracy)
+                if isinstance(self.loss, BinaryCrossEntropy):
+                    val_accuracy = accuracy_score(y_val, np.round(val_pred))
+                    val_accuracies.append(val_accuracy)
+                elif isinstance(self.loss, MeanSquaredError):
+                    val_accuracy = mean_squared_error(y_val, np.round(val_pred))
+                    val_accuracies.append(val_accuracy)
 
                 #print(f'val_loss foi: {val_loss}')
 
