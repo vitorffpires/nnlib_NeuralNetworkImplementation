@@ -14,7 +14,7 @@ class AdaptiveMomentEstimation(Optimizer):
     - t (int): Time step counter.
     """    
      
-    def __init__(self, learning_rate: float = 0.01, beta_1: float = 0.9, beta_2: float =0.999, epsilon: float = 1e-15) -> None:
+    def __init__(self, learning_rate: float = 0.01, beta_1: float = 0.9, beta_2: float =0.999, epsilon: float = 1e-15, dropout: float = .0) -> None:
         """
         Initialize the Adam optimizer with specified parameters.
         
@@ -23,8 +23,9 @@ class AdaptiveMomentEstimation(Optimizer):
         - beta_1 (float, optional): Exponential decay rate for the first moment estimates. Default is 0.9.
         - beta_2 (float, optional): Exponential decay rate for the second moment estimates. Default is 0.999.
         - epsilon (float, optional): Small constant to prevent division by zero. Default is 1e-15.
+        - dropout (float, optional): Dropout rate. Default is 0.
         """
-        super().__init__(learning_rate)
+        super().__init__(learning_rate, dropout)
         self.beta_1 = beta_1
         self.beta_2 = beta_2
         self.epsilon = epsilon
@@ -68,5 +69,13 @@ class AdaptiveMomentEstimation(Optimizer):
         v_corrected_b = layer.v_b / (1. - self.beta_2**self.t)
         
         # Update weights and biases
-        layer.weights = layer.weights - (self.learning_rate * m_corrected_w / (np.sqrt(v_corrected_w) + self.epsilon))
+        updated_weights = (self.learning_rate * m_corrected_w / (np.sqrt(v_corrected_w) + self.epsilon))
+        if self.dropout > 0:
+            idx_qty = int(len(layer.weights) * self.dropout)
+            idx_dropouts = np.random.randint(0, len(layer.weights), idx_qty)
+            
+            for idx in idx_dropouts:
+                updated_weights[idx] = 0
+
+        layer.weights = layer.weights - updated_weights
         layer.bias = layer.bias - (self.learning_rate * m_corrected_b / (np.sqrt(v_corrected_b) + self.epsilon))
