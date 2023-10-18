@@ -162,7 +162,7 @@ class SequentialModel():
                 val_loss = self.evaluate(X = X_val, y = y_val)
                 val_losses.append(val_loss)
                 val_pred = self.predict(X_val)
-                if isinstance(self.loss, BinaryCrossEntropy):
+                if isinstance(self.loss, BinaryCrossEntropy) or isinstance(self.loss, CategoricalCrossEntropy):
                     val_accuracy = accuracy_score(y_val, np.round(val_pred))
                     val_accuracies.append(val_accuracy)
                 elif isinstance(self.loss, MeanSquaredError):
