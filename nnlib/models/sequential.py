@@ -5,6 +5,7 @@ import joblib
 from nnlib.layers.layer import Layer
 from nnlib.loss_functions.loss import LossFunction
 from nnlib.loss_functions.bce import BinaryCrossEntropy
+from nnlib.loss_functions.cce import CategoricalCrossEntropy
 from nnlib.loss_functions.mse import MeanSquaredError
 from nnlib.optimization_functions.optimizer import Optimizer
 from nnlib.optimization_functions.adam import AdaptiveMomentEstimation
@@ -149,7 +150,7 @@ class SequentialModel():
             avg_epoch_loss = np.average(epoch_losses)
             train_losses.append(avg_epoch_loss)
             train_pred = self.predict(X)
-            if isinstance(self.loss, BinaryCrossEntropy):
+            if isinstance(self.loss, BinaryCrossEntropy) or isinstance(self.loss, CategoricalCrossEntropy):
                 train_accuracy = accuracy_score(y, np.round(train_pred))
                 train_accuracies.append(train_accuracy)
             elif isinstance(self.loss, MeanSquaredError):
